@@ -1,0 +1,39 @@
+.#testing with a separate data set
+import pandas as pd
+import numpy as np
+from xgboost import XGBClassifier
+sdf=pd.read_csv("single_muon_data_sample3.txt",header=None).values
+mdf=pd.read_csv("multi_muon_2_7.txt",header=None).values
+ndf=pd.read_csv("noise_sample1.txt",header=None).values
+tdf=pd.read_csv("test.txt",header=None).values
+
+clf=XGBClassifier(learning_rate=0.08,n_estimators=100,max_depth=4,tree_method='gpu_hist')
+strain=sdf[:,:-1]
+strain_label=sdf[:,-1]
+ntrain=ndf[:,:-1]
+ntrain_label=ndf[:,-1]
+mtrain=mdf[:,:-1]
+mtrain_label=mdf[:,-1]
+t_train=np.concatenate((strain,mtrain,ntrain),axis=0)
+t_train_label=np.concatenate((strain_label,mtrain_label,ntrain_label),axis=0)
+clf.fit(t_train,t_train_label)
+p=clf.predict(tdf)
+sm=mm=nm=0
+for i in range(len(p)):
+    st=''
+    if(p[i]==1):
+        sm+=1
+        st+="single muon event"
+    elif(p[i]==2):
+        mm+=1
+        st+="multi muon event"
+    else:
+        nm+=1
+        st+="noisy event"
+    tabdf=pd.DataFrame({"event":[i+1],"label":[st],"single":[sm],"multi":[mm],"noise":[nm]})
+    if(i==0):
+        newtab=tabdf
+    else:
+        newtab=pd.concat([newtab,tabdf])
+        newtab.reset_index(inplace=True,drop=True)
+newtab.to_csv("Test_trig5_noise_mult_2_7.csv",sep=',',header=True,index=False)
