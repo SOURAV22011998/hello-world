@@ -1,0 +1,17 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+df=pd.read_csv("E:/user data/Downloads/c217_500events.txt",header=None).values
+for i in range(1):
+    plt.spy(np.reshape(df[i,:384],(12,32)),markersize=3,aspect=3.0,origin="lower")
+    plt.grid()
+    plt.xlabel("Strips")
+    plt.ylabel("Layers")
+    plt.title("X-Z plane",fontdict=None, loc='center', pad=None)
+    plt.show()
+    plt.spy(np.reshape(df[i,384:],(12,32)),markersize=3,aspect=3.0,origin="lower")
+    plt.grid()
+    plt.xlabel("Strips")
+    plt.ylabel("Layers")
+    plt.title("Y-Z plane",fontdict=None, loc='center', pad=None)
+    plt.show()
